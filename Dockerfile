@@ -1,8 +1,15 @@
 FROM php:8.2-cli
 
-# Install required packages
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    libzip-dev unzip sqlite3 wget git && docker-php-ext-install zip pdo pdo_sqlite
+    libzip-dev \
+    unzip \
+    sqlite3 \
+    wget \
+    git \
+    libsqlite3-dev \
+    && docker-php-ext-configure pdo_sqlite --with-pdo-sqlite \
+    && docker-php-ext-install zip pdo pdo_sqlite
 
 # Set working directory
 WORKDIR /app
@@ -16,11 +23,11 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Generate APP Key
-RUN php artisan key:generate --ansi
+# Set correct permissions for Laravel storage & cache
+RUN chmod -R 777 storage bootstrap/cache
 
-# Expose port
+# Expose port 8000
 EXPOSE 8000
 
-# Run Laravel's server
+# Run Laravel's built-in server
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
