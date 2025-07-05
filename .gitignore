@@ -1,5 +1,4 @@
 *.log
-.DS_Store
 .env
 .env.backup
 .env.production
@@ -21,4 +20,3 @@
 /vendor
 Homestead.json
 Homestead.yaml
-Thumbs.db
